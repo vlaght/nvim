@@ -1,11 +1,9 @@
 return {
   {
     "stevearc/conform.nvim",
-    -- event = 'BufWritePre', -- uncomment for format on save
+    event = 'BufWritePre', -- uncomment for format on save
     opts = require "configs.conform",
   },
-
-  -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
     config = function()
@@ -19,7 +17,7 @@ return {
       ensure_installed = { "lua", "python" },
     },
   },
-  { 'echasnovski/mini.nvim', branch = "stable" }, 
+  { "echasnovski/mini.nvim", branch = "stable" },
   -- {
   --   "jake-stewart/multicursor.nvim",
   --   branch = "1.0",
@@ -81,4 +79,28 @@ return {
   --       hl(0, "MultiCursorDisabledSign", { link = "SignColumn"})
   --   end
   -- },
+  {
+    "olimorris/codecompanion.nvim",
+    config = true,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {
+      strategies = {
+        chat = {
+          adapter = "copilot",
+        },
+        inline = {
+          adapter = "copilot",
+        },
+        cmd = {
+          adapter = "copilot",
+        }
+      },
+      opts = {
+        log_level = "DEBUG",
+      }
+    }
+  },
 }

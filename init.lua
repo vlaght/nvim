@@ -35,14 +35,11 @@ require "nvchad.autocmds"
 -- Configure `ruff-lsp`.
 -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ruff_lsp
 -- For the default config, along with instructions on how to customize the settings
-local on_attach = function(client, bufnr)
+local on_attach = function(client, _)
   vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", { noremap = true, silent = true })
   vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "mA", "<cmd>lua vim.lsp.buf.code_action()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "mf", "<cmd>lua vim.lsp.buf.format()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "mr", "<cmd>lua vim.lsp.buf.references()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "mR", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "mc", "<cmd>lua vim.lsp.buf.incoming_calls()<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "grf", "<cmd>lua vim.lsp.buf.format()<CR>", { noremap = true, silent = true })
+  vim.api.nvim_set_keymap("n", "grc", "<cmd>lua vim.lsp.buf.incoming_calls()<CR>", { noremap = true, silent = true })
 
   if client.name == "ruff" then
     -- Disable hover in favor of Pyright
@@ -63,31 +60,15 @@ require("lspconfig").pyright.setup {
   },
 }
 
+
 local nvim_tree_api = require "nvim-tree.api"
 nvim_tree_api.tree.toggle()
 
-vim.cmd "Nvdash"
-
--- vim.api.nvim_create_autocmd("Vim")
--- vim.api.nvim_create_autocmd("BufDelete", {
---   callback = function()
---     local bufs = vim.t.bufs
---     if #bufs == 1 and vim.api.nvim_buf_get_name(bufs[1]) == "Empty" then
---       vim.cmd "Nvdash"
---     end
---   end,
--- })
 -- AUTO-HOVER CALL WHEN INSIDE A SYMBOL
 --- Create an augroup for managing hover behavior
 vim.api.nvim_create_augroup("HoverSymbol", { clear = true })
 
 local hover_window = nil
-
--- Helper function to check if there are any LSP clients attached to the current buffer
-local function has_lsp_attached()
-  local clients = vim.lsp.get_clients { bufnr = 0 }
-  return not vim.tbl_isempty(clients)
-end
 
 -- Trigger hover when the cursor is on a symbol
 vim.api.nvim_create_autocmd({ "CursorHold" }, {
@@ -95,7 +76,7 @@ vim.api.nvim_create_autocmd({ "CursorHold" }, {
   pattern = "*",
   callback = function()
     -- Skip hover if no LSP is attached to the current buffer
-    if not has_lsp_attached() then
+    if vim.tbl_isempty(vim.lsp.get_clients { bufnr = 0}) then
       return
     end
 
