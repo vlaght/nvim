@@ -5,8 +5,15 @@ vim.g.mapleader = " "
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
 if not vim.uv.fs_stat(lazypath) then
-  local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+    local repo = "https://github.com/folke/lazy.nvim.git"
+    vim.fn.system {
+        "git",
+        "clone",
+        "--filter=blob:none",
+        repo,
+        "--branch=stable",
+        lazypath,
+    }
 end
 
 vim.opt.rtp:prepend(lazypath)
@@ -15,14 +22,14 @@ local lazy_config = require "configs.lazy"
 
 -- load plugins
 require("lazy").setup({
-  {
-    "NvChad/NvChad",
-    lazy = false,
-    branch = "v2.5",
-    import = "nvchad.plugins",
-  },
+    {
+        "NvChad/NvChad",
+        lazy = false,
+        branch = "v2.5",
+        import = "nvchad.plugins",
+    },
 
-  { import = "plugins" },
+    { import = "plugins" },
 }, lazy_config)
 
 -- load theme
@@ -36,30 +43,49 @@ require "nvchad.autocmds"
 -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ruff_lsp
 -- For the default config, along with instructions on how to customize the settings
 local on_attach = function(client, _)
-  vim.api.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "grf", "<cmd>lua vim.lsp.buf.format()<CR>", { noremap = true, silent = true })
-  vim.api.nvim_set_keymap("n", "grc", "<cmd>lua vim.lsp.buf.incoming_calls()<CR>", { noremap = true, silent = true })
+    vim.api.nvim_set_keymap(
+        "n",
+        "gD",
+        "<cmd>lua vim.lsp.buf.declaration()<CR>",
+        { noremap = true, silent = true }
+    )
+    vim.api.nvim_set_keymap(
+        "n",
+        "gd",
+        "<cmd>lua vim.lsp.buf.definition()<CR>",
+        { noremap = true, silent = true }
+    )
+    vim.api.nvim_set_keymap(
+        "n",
+        "fc",
+        "<cmd>lua vim.lsp.buf.format()<CR>",
+        { noremap = true, silent = true }
+    )
+    vim.api.nvim_set_keymap(
+        "n",
+        "grc",
+        "<cmd>lua vim.lsp.buf.incoming_calls()<CR>",
+        { noremap = true, silent = true }
+    )
 
-  if client.name == "ruff" then
-    -- Disable hover in favor of Pyright
-    client.server_capabilities.hoverProvider = false
-  end
+    if client.name == "ruff" then
+        -- Disable hover in favor of Pyright
+        client.server_capabilities.hoverProvider = false
+    end
 end
 
 require("lspconfig").ruff.setup {
-  on_attach = on_attach,
+    on_attach = on_attach,
 }
 
 require("lspconfig").pyright.setup {
-  on_attach = on_attach,
-  settings = {
-    pyright = {
-      disableOrganizeImports = true,
+    on_attach = on_attach,
+    settings = {
+        pyright = {
+            disableOrganizeImports = true,
+        },
     },
-  },
 }
-
 
 local nvim_tree_api = require "nvim-tree.api"
 nvim_tree_api.tree.toggle()
@@ -72,49 +98,47 @@ local hover_window = nil
 
 -- Trigger hover when the cursor is on a symbol
 vim.api.nvim_create_autocmd({ "CursorHold" }, {
-  group = "HoverSymbol",
-  pattern = "*",
-  callback = function()
-    -- Skip hover if no LSP is attached to the current buffer
-    if vim.tbl_isempty(vim.lsp.get_clients { bufnr = 0}) then
-      return
-    end
-
-    -- Check if the hover window is already open
-    if hover_window and vim.api.nvim_win_is_valid(hover_window) then
-      return
-    end
-
-    -- Safely call hover if the symbol exists
-    local success = pcall(vim.lsp.buf.hover)
-    if success then
-      -- Find the hover window (it is usually the last floating window)
-      local wins = vim.api.nvim_tabpage_list_wins(0)
-      for _, win in ipairs(wins) do
-        local config = vim.api.nvim_win_get_config(win)
-        if config.relative ~= "" then
-          hover_window = win
-          break
+    group = "HoverSymbol",
+    pattern = "*",
+    callback = function()
+        -- Skip hover if no LSP is attached to the current buffer
+        if vim.tbl_isempty(vim.lsp.get_clients { bufnr = 0 }) then
+            return
         end
-      end
-    end
-  end,
+
+        -- Check if the hover window is already open
+        if hover_window and vim.api.nvim_win_is_valid(hover_window) then
+            return
+        end
+
+        -- Safely call hover if the symbol exists
+        local success = pcall(vim.lsp.buf.hover)
+        if success then
+            -- Find the hover window (it is usually the last floating window)
+            local wins = vim.api.nvim_tabpage_list_wins(0)
+            for _, win in ipairs(wins) do
+                local config = vim.api.nvim_win_get_config(win)
+                if config.relative ~= "" then
+                    hover_window = win
+                    break
+                end
+            end
+        end
+    end,
 })
 
 -- Close the hover window when the cursor moves
 vim.api.nvim_create_autocmd({ "CursorMoved" }, {
-  group = "HoverSymbol",
-  pattern = "*",
-  callback = function()
-    if hover_window and vim.api.nvim_win_is_valid(hover_window) then
-      vim.api.nvim_win_close(hover_window, true)
-      hover_window = nil
-    end
-  end,
+    group = "HoverSymbol",
+    pattern = "*",
+    callback = function()
+        if hover_window and vim.api.nvim_win_is_valid(hover_window) then
+            vim.api.nvim_win_close(hover_window, true)
+            hover_window = nil
+        end
+    end,
 })
 
 vim.schedule(function()
-  require "mappings"
+    require "mappings"
 end)
-
-
