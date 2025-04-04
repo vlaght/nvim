@@ -95,6 +95,9 @@ nvim_tree_api.tree.toggle()
 vim.api.nvim_create_augroup("HoverSymbol", { clear = true })
 
 local hover_window = nil
+local ignored_lsp_clients = {
+    "GitHub Copilot",
+}
 
 -- Trigger hover when the cursor is on a symbol
 vim.api.nvim_create_autocmd({ "CursorHold" }, {
@@ -102,7 +105,11 @@ vim.api.nvim_create_autocmd({ "CursorHold" }, {
     pattern = "*",
     callback = function()
         -- Skip hover if no LSP is attached to the current buffer
-        if vim.tbl_isempty(vim.lsp.get_clients { bufnr = 0 }) then
+        local filtered_clients = vim.tbl_filter(function(client)
+            return not vim.tbl_contains(ignored_lsp_clients, client.name)
+        end, vim.lsp.get_clients { bufnr = 0 })
+
+        if vim.tbl_isempty(filtered_clients) then
             return
         end
 
@@ -142,3 +149,5 @@ vim.api.nvim_create_autocmd({ "CursorMoved" }, {
 vim.schedule(function()
     require "mappings"
 end)
+
+vim.opt.relativenumber = true

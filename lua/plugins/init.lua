@@ -18,4 +18,12 @@ return {
         },
     },
     { "echasnovski/mini.nvim", branch = "stable" },
+    {
+        "github/copilot.vim",
+        lazy = false,
+        branch = "release",
+        config = function()
+            vim.g.copilot_assume_mapped = true
+        end,
+    },
 }
