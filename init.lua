@@ -57,7 +57,7 @@ local on_attach = function(client, _)
     )
     vim.api.nvim_set_keymap(
         "n",
-        "fc",
+        "gF",
         "<cmd>lua vim.lsp.buf.format()<CR>",
         { noremap = true, silent = true }
     )
@@ -149,5 +149,7 @@ vim.api.nvim_create_autocmd({ "CursorMoved" }, {
 vim.schedule(function()
     require "mappings"
 end)
+
+require('mini.animate').setup()
 
 vim.opt.relativenumber = true
