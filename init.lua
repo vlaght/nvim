@@ -150,6 +150,4 @@ vim.schedule(function()
     require "mappings"
 end)
 
-require('mini.animate').setup()
-
 vim.opt.relativenumber = true
