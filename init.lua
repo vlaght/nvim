@@ -109,7 +109,7 @@ vim.api.nvim_create_autocmd({ "CursorHold" }, {
             return not vim.tbl_contains(ignored_lsp_clients, client.name)
         end, vim.lsp.get_clients { bufnr = 0 })
 
-        if vim.tbl_isempty(filtered_clients) then
+        if vim.tbl_isempty(filtered_clients) or hover_window ~= nil then
             return
         end
 
