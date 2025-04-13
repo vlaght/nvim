@@ -87,8 +87,9 @@ require("lspconfig").pyright.setup {
     },
 }
 
-local nvim_tree_api = require "nvim-tree.api"
-nvim_tree_api.tree.toggle()
+-- show tree on startup
+-- local nvim_tree_api = require "nvim-tree.api"
+-- nvim_tree_api.tree.toggle()
 
 -- AUTO-HOVER CALL WHEN INSIDE A SYMBOL
 --- Create an augroup for managing hover behavior
