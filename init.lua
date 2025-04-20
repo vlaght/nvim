@@ -74,11 +74,13 @@ local on_attach = function(client, _)
     end
 end
 
-require("lspconfig").ruff.setup {
+local lspconfig = require "lspconfig"
+
+lspconfig.ruff.setup {
     on_attach = on_attach,
 }
 
-require("lspconfig").pyright.setup {
+lspconfig.pyright.setup {
     on_attach = on_attach,
     settings = {
         pyright = {
@@ -87,6 +89,7 @@ require("lspconfig").pyright.setup {
     },
 }
 
+lspconfig.gopls.setup {}
 -- show tree on startup
 -- local nvim_tree_api = require "nvim-tree.api"
 -- nvim_tree_api.tree.toggle()
